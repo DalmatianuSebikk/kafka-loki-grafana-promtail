@@ -1,0 +1,34 @@
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 0
+
+positions:
+  filename: /tmp/positions.yaml
+
+clients:
+  - url: http://loki:3100/loki/api/v1/push
+
+scrape_configs:
+- job_name: kafka
+  kafka:
+    brokers:
+    - apache-kafka-server:9092
+    topics:
+    # aici pot fi puse mai multe topicuri si pot fi scrise topicuri si sub forma regex
+    # firsttopic
+    - firsttopic
+    labels:
+      job: kafka
+  relabel_configs:
+      - action: replace
+        source_labels:
+          - __meta_kafka_topic
+        target_label: topic
+      - action: replace
+        source_labels:
+          - __meta_kafka_partition
+        target_label: partition
+      - action: replace
+        source_labels:
+          - __meta_kafka_group_id
+        target_label: group

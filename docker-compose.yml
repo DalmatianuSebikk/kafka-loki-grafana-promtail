@@ -1,0 +1,67 @@
+version: '3'
+services:
+
+  zookeeper-server:
+    image: 'bitnami/zookeeper:latest'
+    ports:
+      - '2181:2181'
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+
+  apache-kafka-server:
+    image: 'bitnami/kafka:latest'
+    ports:
+      - '9092:9092'
+      - '9093:9093'
+    
+    # e pentru development only, pentru deploy sau alte chestii se modifica setarile din ce vad pe aici.
+    environment:
+      - KAFKA_BROKER_ID=1
+
+      # - ALLOW_PLAINTEXT_LISTENER=yes
+      # # fiecare listener trebuie sa aiba un port diferit, deci l-am lasat pe ala normal pentru loki grafana si etc si celalalt pt cod.
+      # - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=PROMTAIL_LISTENER:PLAINTEXT,JAVA_LISTENER:PLAINTEXT
+
+      # - KAFKA_CFG_LISTENERS=PROMTAIL_LISTENER://:9092,JAVA_LISTENER://:9091
+
+      # - KAFKA_CFG_ADVERTISED_LISTENERS=PROMTAIL_LISTENER://apache-kafka-server:9092,JAVA_LISTENER://localhost:9091
+      
+      # - KAFKA_CFG_INTER_BROKER_LISTENER_NAME:PROMTAIL_LISTENER
+
+      # - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper-server:2181
+
+      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper-server:2181
+
+      - ALLOW_PLAINTEXT_LISTENER=yes
+
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CLIENT:PLAINTEXT,EXTERNAL:PLAINTEXT
+
+      - KAFKA_CFG_LISTENERS=CLIENT://:9092,EXTERNAL://:9093
+
+      - KAFKA_CFG_ADVERTISED_LISTENERS=CLIENT://apache-kafka-server:9092,EXTERNAL://localhost:9093
+      
+      - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=CLIENT
+      
+    
+    depends_on:
+      - zookeeper-server
+
+  # https://component-pages--vector-project.netlify.app/guides/integrate/sources/kafka/loki/ ca sa pot sa conectez ce am eu cu loki.
+  
+  loki:
+    image: 'grafana/loki:latest'
+    ports:
+      - '3100:3100'
+    command: -config.file=/etc/loki/local-config.yaml
+
+  promtail:
+    build: .
+    image: 'grafana/promtail:latest'
+    volumes:
+      - './promtail-kafka-config.yaml:/etc/promtail/promtail-kafka-config.yaml'
+    command: -config.file=/etc/promtail/promtail-kafka-config.yaml
+
+  grafana:
+    image: grafana/grafana
+    ports:
+      - '3000:3000'
