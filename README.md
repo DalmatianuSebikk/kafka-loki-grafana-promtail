@@ -16,6 +16,7 @@ Here is *how to use it*:
 - I don't know yet if the topics are saved when you close the program, but you can create a new image with `docker commit`
 - Kafka commands when are typed with `docker exec -it kafkaContainerID sh` and they look the same as in my Notion: https://www.notion.so/Apache-Kafka-956bd8380e784291b6f3123a6fecf023 You can also look at their documentation.: https://hub.docker.com/r/bitnami/kafka/
 - When you are adding a Loki database in Grafana, type `http://loki:3100`, because `localhost:3100` doesn't get anywhere. You should use the _Docker DNS Lookup_ when you can do that.
+- !!! VERY IMPORTANT !!! When you want to communicate out of Docker with the Kafka Server, use the `localhost:9093`
 
 
 
