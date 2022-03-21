@@ -55,11 +55,17 @@ services:
     command: -config.file=/etc/loki/local-config.yaml
 
   promtail:
-    build: .
     image: 'grafana/promtail:latest'
+    deploy:
+      replicas: 2
+    restart: always
+
     volumes:
       - './promtail-kafka-config.yaml:/etc/promtail/promtail-kafka-config.yaml'
+      
     command: -config.file=/etc/promtail/promtail-kafka-config.yaml
+    depends_on:
+      - apache-kafka-server
 
   grafana:
     image: grafana/grafana
