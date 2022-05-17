@@ -1,6 +1,6 @@
 # Kafka & Grafana & Loki & Promtail Docker Container
 ## _For making it easier_
-A multi container docker compose with the configurated services. 
+A multi container docker compose with the configured services. 
 
 Here is *how to use it*:
 
